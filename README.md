@@ -4,7 +4,7 @@ A class wrapper that simplifies interaction with InfluxDB 2.0+
 
 ## Introduction
 
-The `influx_database.py` consists of 2 main classes, `Datapoint` and `InfluxDatabase`.  
+The `influxdb_tool` consists of 2 main classes, `Datapoint` and `InfluxDatabase`.  
 `Datapoint` is the main data class that is used to construct our data before writing data into InfluxDB using a method in `InfluxDatabase` class.
 
 ## Dependencies
@@ -24,34 +24,43 @@ Assuming that we have the following project structure
 │   ├── ...
 │   └── ...
 ├── influxdb_tool
+│   └── datapoint.py
 │   └── influx_database.py
 ├── config.py
 └── main.py
 ```
 
-and InfluxDB details are stored in `config.py`
+and InfluxDB details are stored in `config.ini`
 
 > ***Note:***  
 > All InfluxDB details can be obtained/ set up via InfluxDB UI.  
 > If InfluxDB is installed correctly and the service is running, the UI can be accessed at `{IP_ADDRESS}:8086`
 
-```python
-TOKEN="example_token"
-ORG="my_org"
-BUCKET="my_bucket"
-IP_ADDRESS="123.234.45.67"
+```ini
+['influxdb']
+token=example_token
+org=my_org
+bucket=my_bucket
+ip_address=123.234.45.67
 ```
 
 Hence, we can initialize our `InfluxDatabase` class as shown below.
 
 ```python
-from influxdb_tool.influx_database import InfluxDatabase, Datapoint
+import configparser
+from influxdb_tool.influx_database import InfluxDatabase
+from influxdb_tool.datapoint import Datapoint
+
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 influx_db = InfluxDatabase(
-    token=config.TOKEN,
-    org=config.ORG,
-    bucket=config.BUCKET,
-    ipaddress=config.IP_ADDRESS)
+    token=config['influxdb']['token'],
+    org=config['influxdb']['org'],
+    bucket=config['influxdb']['bucket'],
+    ipaddress=config['influxdb']['ip_address']
+)
 ```
 
 To construct a `Datapoint`
@@ -159,9 +168,10 @@ In this case, point 2 is a more viable solution, because it reduces the complexi
 The full example is as below.
 
 ```python
-from influxdb_tool.influx_database import InfluxDatabase, Datapoint
+import configparser
+from influxdb_tool.influx_database import InfluxDatabase
+from influxdb_tool.datapoint import Datapoint
 from datetime import datetime
-import config
 
 
 def write_data_to_database(raw_data: dict):
@@ -188,11 +198,14 @@ def write_data_to_database(raw_data: dict):
     influx_db.write_bulk_datapoints(datapoints)
 
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 influx_db = InfluxDatabase(
-    token=config.TOKEN,
-    org=config.ORG,
-    bucket=config.BUCKET,
-    ipaddress=config.IP_ADDRESS
+    token=config['influxdb']['token'],
+    org=config['influxdb']['org'],
+    bucket=config['influxdb']['bucket'],
+    ipaddress=config['influxdb']['ip_address']
 )
 
 # ...

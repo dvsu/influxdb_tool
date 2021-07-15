@@ -1,7 +1,7 @@
 from influx_database import InfluxDatabase
 from datapoint import Datapoint
 from datetime import datetime
-import config
+import configparser
 
 
 def write_data_to_database(raw_data: dict):
@@ -28,11 +28,14 @@ def write_data_to_database(raw_data: dict):
     influx_db.write_bulk_datapoints(datapoints)
 
 
+config = configparser.ConfigParser()
+config.read('config.ini')
+
 influx_db = InfluxDatabase(
-    token=config.TOKEN,
-    org=config.ORG,
-    bucket=config.BUCKET,
-    ipaddress=config.IP_ADDRESS
+    token=config['influxdb']['token'],
+    org=config['influxdb']['org'],
+    bucket=config['influxdb']['bucket'],
+    ipaddress=config['influxdb']['ip_address']
 )
 
 # Let say we receive sensor data from our equipment
