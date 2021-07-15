@@ -1,4 +1,5 @@
-from influx_database import Datapoint, InfluxDatabase
+from influx_database import InfluxDatabase
+from datapoint import Datapoint
 from datetime import datetime
 import config
 
